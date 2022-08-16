@@ -57,35 +57,35 @@
                     </AppBarButton.Flyout>
                 </AppBarButton>
             </AppBarElementContainer>
-            <AppBarButton Label="Undo">
+            <AppBarButton Label="Undo" x:Name="Undo" Click="Undo_Click">
                 <FontIcon Glyph="&#xE10E;" />
             </AppBarButton>
-            <AppBarButton Label="Redo">
+            <AppBarButton Label="Redo" x:Name="Redo" Click="Redo_Click">
                 <FontIcon Glyph="&#xE10D;" />
             </AppBarButton>
             <AppBarSeparator/>
-            <AppBarButton Label="Cut">
+            <AppBarButton Label="Cut" x:Name="Cut" Click="Cut_Click">
                 <FontIcon Glyph="&#xE16B;" />
             </AppBarButton>
-            <AppBarButton Label="Copy">
+            <AppBarButton Label="Copy" x:Name="Copy" Click="Copy_Click">
                 <FontIcon Glyph="&#xE16F;" />
             </AppBarButton>
-            <AppBarButton Label="Paste">
+            <AppBarButton Label="Paste" x:Name="Paste" Click="Paste_ClickAsync">
                 <FontIcon Glyph="&#xE16D;" />
             </AppBarButton>
             <AppBarSeparator/>
-            <AppBarToggleButton Label="Bold">
+            <AppBarToggleButton Label="Bold" x:Name="Bold" Click="Bold_Click">
                 <FontIcon Glyph="&#xE19B;" />
             </AppBarToggleButton>
-            <AppBarToggleButton Label="Italic">
+            <AppBarToggleButton Label="Italic" x:Name="Italic" Click="Italic_Click">
                 <FontIcon Glyph="&#xE199;" />
             </AppBarToggleButton>
-            <AppBarToggleButton Label="Underline">
+            <AppBarToggleButton Label="Underline" x:Name="Underline" Click="Underline_Click">
                 <FontIcon Glyph="&#xE19A;" />
             </AppBarToggleButton>
             <AppBarSeparator/>
             <AppBarElementContainer VerticalAlignment="Center" VerticalContentAlignment="Center">
-                <ComboBox PlaceholderText="Font family" MinWidth="200" Margin="5,0,5,16" BorderThickness="0" Background="Transparent"/>
+                <ComboBox PlaceholderText="Font family" x:Name="fontscombo" MinWidth="200" Margin="5,0,5,16" BorderThickness="0" Background="Transparent"/>
             </AppBarElementContainer>
             <AppBarElementContainer VerticalAlignment="Center" VerticalContentAlignment="Center">
                 <ComboBox PlaceholderText="Text size" Margin="5,0,5,16" BorderThickness="0" Background="Transparent"/>
@@ -107,7 +107,7 @@
                 <FontIcon Glyph="&#xE1A0;" />
             </AppBarButton>
         </CommandBar>
-            <RichEditBox Style="{StaticResource BetterRichEditBoxStyle}" TextChanged="text_TextChanged" BorderThickness="0" CornerRadius="0" VerticalAlignment="Stretch" x:Name="text" HorizontalAlignment="Stretch"/>
+            <RichEditBox Style="{StaticResource BetterRichEditBoxStyle}" SelectionChanged="text_SelectionChanged" TextChanged="text_TextChanged" BorderThickness="0" CornerRadius="0" VerticalAlignment="Stretch" x:Name="text" HorizontalAlignment="Stretch"/>
         <StackPanel Orientation="Horizontal" Height="32" BorderThickness="0,1,0,0" BorderBrush="{StaticResource AppBarBorderThemeBrush}"  VerticalAlignment="Bottom" x:Name="bottombar" Padding="15,0,0,0" Background="{StaticResource LayerFillColorDefaultBrush}">
             <TextBlock FontWeight="SemiBold" FontSize="10" VerticalAlignment="Center">Word count:</TextBlock>
             <TextBlock FontWeight="Normal" FontSize="10" Margin="2,0,0,0" VerticalAlignment="Center" x:Name="wordcount">0</TextBlock>
