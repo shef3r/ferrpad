@@ -1,279 +1,170 @@
+﻿using Microsoft.UI.Xaml.Controls;
 using System;
-using AppUIBasics.TabViewPages;
-using Microsoft.UI.Xaml.Controls;
-using Microsoft.UI.Xaml.Controls.Primitives;
-using Windows.ApplicationModel.Core;
-using Windows.ApplicationModel.DataTransfer;
-using Windows.Foundation.Metadata;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
+using System.Linq;
+using System.Runtime.InteropServices.WindowsRuntime;
+using Windows.Foundation;
+using Windows.Foundation.Collections;
+using Windows.Storage;
+using Windows.UI.Text;
 using Windows.UI.ViewManagement;
-using Windows.UI.WindowManagement;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Hosting;
+using Windows.UI.Xaml.Controls.Primitives;
+using Windows.UI.Xaml.Data;
+using Windows.UI.Xaml.Input;
+using Windows.UI.Xaml.Media;
+using Windows.UI.Xaml.Media.Imaging;
 using Windows.UI.Xaml.Navigation;
+
+//Szablon elementu Pusta strona jest udokumentowany na stronie https://go.microsoft.com/fwlink/?LinkId=234238
 
 namespace ferrpad
 {
+    /// <summary>
+    /// Pusta strona, która może być używana samodzielnie lub do której można nawigować wewnątrz ramki.
+    /// </summary>
+    
     public sealed partial class MainPage : Page
     {
-        AppWindow RootAppWindow = null;
-
-        private const string DataIdentifier = "MyTabItem";
+        StorageFile file {  get; set; }
         public MainPage()
         {
+
             this.InitializeComponent();
-
-            Tabs.TabItemsChanged += Tabs_TabItemsChanged;
+            ApplicationDataContainer localSettings = ApplicationData.Current.LocalSettings;
+            Object value = localSettings.Values["FirstLaunchFinished"];
+            Window.Current.SetTitleBar(ttb);
+            if (value == null)
+            {
+                WelcomeDialog();
+                localSettings.Values["FirstLaunchFinished"] = "done";
+            }
         }
 
-        private async void Tabs_TabItemsChanged(TabView sender, Windows.Foundation.Collections.IVectorChangedEventArgs args)
+        private async void WelcomeDialog()
         {
-            // If there are no more tabs, close the window.
-            if (sender.TabItems.Count == 0)
+            try
             {
-                if (RootAppWindow != null)
-                {
-                    await RootAppWindow.CloseAsync();
-                }
-                else
-                {
-                    Window.Current.Close();
-                }
+                ContentDialog dialog = new ContentDialog() { PrimaryButtonText = "Let's get started!" };
+                StackPanel desc = new StackPanel();
+                desc.HorizontalAlignment = HorizontalAlignment.Center;
+                desc.Children.Add(new Image() { Source = new BitmapImage() { UriSource = new Uri("ms-appx:///Assets/logowtext.png") }, Width = 300, HorizontalAlignment = HorizontalAlignment.Center, VerticalAlignment = VerticalAlignment.Center });
+                desc.Children.Add(new TextBlock() { Text = "Welcome to ferrpad!", FontSize = 30, FontWeight = FontWeights.Bold, FontFamily = new FontFamily("Segoe UI Variable"), HorizontalAlignment = HorizontalAlignment.Center });
+                desc.Children.Add(new TextBlock() { Text = "the text document editor for Windows 10 and 11", FontSize = 20, FontFamily = new FontFamily("Segoe UI"), HorizontalAlignment = HorizontalAlignment.Center });
+                dialog.Content = desc;
+                await dialog.ShowAsync();
             }
-            // If there is only one tab left, disable dragging and reordering of Tabs.
-            else if (sender.TabItems.Count == 1)
+            catch (Exception ex)
             {
-                sender.CanReorderTabs = false;
-                sender.CanDragTabs = false;
+                Debug.WriteLine(ex);
+                showerror(ex.ToString());
+            }
+        }
+
+        private async void showerror(string error)
+        {
+            ContentDialog dialogerror = new ContentDialog();
+            dialogerror.Title = "Oops, an error occured!";
+            dialogerror.PrimaryButtonText = "OK";
+            dialogerror.Content = error;
+            await dialogerror.ShowAsync();
+        }
+
+        private void UserControl_SizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            text.Margin = new Thickness(0, comcont.ActualHeight, 0, bottombar.ActualHeight);
+        }
+
+        private void text_TextChanged(object sender, RoutedEventArgs e)
+        {
+            string textextract = text.Text;
+            char[] delimiters = new char[] { ' ', '\r', '\n' };
+            wordcount.Text = textextract.Split(delimiters, StringSplitOptions.RemoveEmptyEntries).Length.ToString();
+        }
+
+        private void Undo_Click(object sender, RoutedEventArgs e)
+        {
+            if (text.CanUndo)
+            {
+                text.Undo();
+            }
+
+        }
+
+        private void Redo_Click(object sender, RoutedEventArgs e)
+        {
+            if (text.CanRedo)
+            {
+                text.Redo();
+            }
+        }
+
+        private void Cut_Click(object sender, RoutedEventArgs e)
+        {
+            text.CopySelectionToClipboard();
+            text.Text.Remove(text.Text.IndexOf(text.SelectedText));
+        }
+
+        private void Copy_Click(object sender, RoutedEventArgs e)
+        {
+            text.CopySelectionToClipboard();
+        }
+
+        private void Paste_ClickAsync(object sender, RoutedEventArgs e)
+        {
+            if (text.CanPasteClipboardContent)
+            {
+                text.PasteFromClipboard();
+            }
+        }
+
+        private async void NotImplemented(string thing)
+        {
+            ContentDialog notimplemented = new ContentDialog() { PrimaryButtonText = "Okay ill wait lmaooo", Title = "Not " + thing + " not working :skull:", Content = thing + " doesnt work yet cause idk or am too lazy to implement it 💀", SecondaryButtonText = "Complain" };
+            notimplemented.SecondaryButtonClick += Notimplemented_SecondaryButtonClick;
+            await notimplemented.ShowAsync();
+        }
+
+        private async void Notimplemented_SecondaryButtonClick(ContentDialog sender, ContentDialogButtonClickEventArgs args)
+        {
+            await Windows.System.Launcher.LaunchUriAsync(new Uri("https://github.com/shef3r/ferrpad/issues/new"));
+        }
+
+        private void text_SelectionChanged(object sender, RoutedEventArgs e)
+        {
+        }
+
+        private void AppBarButton_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private async void Open_Click(object sender, RoutedEventArgs e)
+        {
+            var picker = new Windows.Storage.Pickers.FileOpenPicker();
+            picker.ViewMode = Windows.Storage.Pickers.PickerViewMode.Thumbnail;
+            picker.SuggestedStartLocation = Windows.Storage.Pickers.PickerLocationId.DocumentsLibrary;
+            picker.FileTypeFilter.Add(".txt");
+
+            file = await picker.PickSingleFileAsync();
+            if (file != null)
+            {
+                ApplicationView appView = ApplicationView.GetForCurrentView();
+                appView.Title = file.Name;
+                text.Text = await FileIO.ReadTextAsync(file);
+                text.ClearUndoRedoHistory();
             }
             else
             {
-                sender.CanReorderTabs = true;
-                sender.CanDragTabs = true;
             }
         }
 
-        protected override void OnNavigatedTo(NavigationEventArgs e)
+        private async void Save_Click(object sender, RoutedEventArgs e)
         {
-            base.OnNavigatedTo(e);
-
-            SetupWindow(null);
-        }
-
-        void SetupWindow(AppWindow window)
-        {
-            if (window == null)
-            {
-                Tabs.TabItems.Add(CreateNewTVI("New untitled document", ""));
-                Tabs.SelectedIndex = 0;
-
-                // Extend into the titlebar
-                var coreTitleBar = CoreApplication.GetCurrentView().TitleBar;
-                coreTitleBar.ExtendViewIntoTitleBar = true;
-
-                coreTitleBar.LayoutMetricsChanged += CoreTitleBar_LayoutMetricsChanged;
-
-                var titleBar = ApplicationView.GetForCurrentView().TitleBar;
-                titleBar.ButtonBackgroundColor = Windows.UI.Colors.Transparent;
-                titleBar.ButtonInactiveBackgroundColor = Windows.UI.Colors.Transparent;
-
-                Window.Current.SetTitleBar(CustomDragRegion);
-            }
-            else
-            {
-                // Secondary AppWindows --- keep track of the window
-                RootAppWindow = window;
-
-                // Extend into the titlebar
-                window.TitleBar.ExtendsContentIntoTitleBar = true;
-                window.TitleBar.ButtonBackgroundColor = Windows.UI.Colors.Transparent;
-                window.TitleBar.ButtonInactiveBackgroundColor = Windows.UI.Colors.Transparent;
-
-                // Due to a bug in AppWindow, we cannot follow the same pattern as CoreWindow when setting the min width.
-                // Instead, set a hardcoded number. 
-                CustomDragRegion.MinWidth = 188;
-
-                window.Frame.DragRegionVisuals.Add(CustomDragRegion);
-            }
-        }
-
-        private void CoreTitleBar_LayoutMetricsChanged(CoreApplicationViewTitleBar sender, object args)
-        {
-            // To ensure that the tabs in the titlebar are not occluded by shell
-            // content, we must ensure that we account for left and right overlays.
-            // In LTR layouts, the right inset includes the caption buttons and the
-            // drag region, which is flipped in RTL. 
-
-            // The SystemOverlayLeftInset and SystemOverlayRightInset values are
-            // in terms of physical left and right. Therefore, we need to flip
-            // then when our flow direction is RTL.
-            if (FlowDirection == FlowDirection.LeftToRight)
-            {
-                CustomDragRegion.MinWidth = sender.SystemOverlayRightInset;
-                ShellTitlebarInset.MinWidth = sender.SystemOverlayLeftInset;
-            }
-            else
-            {
-                CustomDragRegion.MinWidth = sender.SystemOverlayLeftInset;
-                ShellTitlebarInset.MinWidth = sender.SystemOverlayRightInset;
-            }
-
-            // Ensure that the height of the custom regions are the same as the titlebar.
-            CustomDragRegion.Height = ShellTitlebarInset.Height = sender.Height;
-        }
-
-        public void AddTabToTabs(TabViewItem tab)
-        {
-            Tabs.TabItems.Add(tab);
-        }
-
-        // Create a new Window once the Tab is dragged outside.
-        private void Tabs_TabDroppedOutside(TabView sender, TabViewTabDroppedOutsideEventArgs args)
-        {
-            MoveTabToNewWindow(args.Tab);
-        }
-
-        private async void MoveTabToNewWindow(TabViewItem tab)
-        {
-
-            // AppWindow was introduced in Windows 10 version 18362 (ApiContract version 8). 
-            // If the app is running on a version earlier than 18362, simply no-op.
-            // If your app needs to support multiple windows on earlier versions of Win10, you can use CoreWindow/ApplicationView.
-            // More information about showing multiple views can be found here: https://docs.microsoft.com/windows/uwp/design/layout/show-multiple-views
-            if (!ApiInformation.IsApiContractPresent("Windows.Foundation.UniversalApiContract", 8))
-            {
-                return;
-            }
-
-            AppWindow newWindow = await AppWindow.TryCreateAsync();
-
-            var newPage = new MainPage();
-            newPage.SetupWindow(newWindow);
-
-            ElementCompositionPreview.SetAppWindowContent(newWindow, newPage);
-
-            Tabs.TabItems.Remove(tab);
-            newPage.AddTabToTabs(tab);
-
-            await newWindow.TryShowAsync();
-        }
-
-        private void Tabs_TabDragStarting(TabView sender, TabViewTabDragStartingEventArgs args)
-        {
-            // We can only drag one tab at a time, so grab the first one...
-            var firstItem = args.Tab;
-
-            // ... set the drag data to the tab...
-            args.Data.Properties.Add(DataIdentifier, firstItem);
-
-            // ... and indicate that we can move it 
-            args.Data.RequestedOperation = DataPackageOperation.Move;
-        }
-
-        private void Tabs_TabStripDrop(object sender, DragEventArgs e)
-        {
-            // This event is called when we're dragging between different TabViews
-            // It is responsible for handling the drop of the item into the second TabView
-
-            if (e.DataView.Properties.TryGetValue(DataIdentifier, out object obj))
-            {
-                // Ensure that the obj property is set before continuing. 
-                if (obj == null)
-                {
-                    return;
-                }
-
-                var destinationTabView = sender as TabView;
-                var destinationItems = destinationTabView.TabItems;
-
-                if (destinationItems != null)
-                {
-                    // First we need to get the position in the List to drop to
-                    var index = -1;
-
-                    // Determine which items in the list our pointer is between.
-                    for (int i = 0; i < destinationTabView.TabItems.Count; i++)
-                    {
-                        var item = destinationTabView.ContainerFromIndex(i) as TabViewItem;
-
-                        if (e.GetPosition(item).X - item.ActualWidth < 0)
-                        {
-                            index = i;
-                            break;
-                        }
-                    }
-
-                    // The TabView can only be in one tree at a time. Before moving it to the new TabView, remove it from the old.
-                    var destinationTabViewListView = ((obj as TabViewItem).Parent as TabViewListView);
-                    destinationTabViewListView.Items.Remove(obj);
-
-                    if (index < 0)
-                    {
-                        // We didn't find a transition point, so we're at the end of the list
-                        destinationItems.Add(obj);
-                    }
-                    else if (index < destinationTabView.TabItems.Count)
-                    {
-                        // Otherwise, insert at the provided index.
-                        destinationItems.Insert(index, obj);
-                    }
-
-                    // Select the newly dragged tab
-                    destinationTabView.SelectedItem = obj;
-                }
-            }
-        }
-
-        // This method prevents the TabView from handling things that aren't text (ie. files, images, etc.)
-        private void Tabs_TabStripDragOver(object sender, DragEventArgs e)
-        {
-            if (e.DataView.Properties.ContainsKey(DataIdentifier))
-            {
-                e.AcceptedOperation = DataPackageOperation.Move;
-            }
-        }
-
-        private void Tabs_AddTabButtonClick(TabView sender, object args)
-        {
-            sender.TabItems.Add(CreateNewTVI("New Item", "New Item"));
-        }
-
-
-        private TabViewItem CreateNewTVI(string header, string dataContext)
-        {
-            var newTab = new TabViewItem()
-            {
-                IconSource = new Microsoft.UI.Xaml.Controls.SymbolIconSource()
-                {
-                    Symbol = Symbol.Document
-                },
-                Header = header,
-                Content = new MyTabContentControl()
-                {
-                    DataContext = dataContext
-                }
-            };
-
-            var contextFlyout = new MenuFlyout();
-            var moveToNewWindowFlyout = new MenuFlyoutItem();
-
-            moveToNewWindowFlyout.Text = "Move to new window";
-            moveToNewWindowFlyout.Click += MoveToNewWindowFlyout_Click;
-            contextFlyout.Items.Add(moveToNewWindowFlyout);
-
-            newTab.ContextFlyout = contextFlyout;
-
-            void MoveToNewWindowFlyout_Click(object _sender, RoutedEventArgs e)
-            {
-                MoveTabToNewWindow(newTab);
-            }
-
-            return newTab;
-        }
-
-        private void Tabs_TabCloseRequested(TabView sender, TabViewTabCloseRequestedEventArgs args)
-        {
-            sender.TabItems.Remove(args.Tab);
+            await FileIO.WriteTextAsync(file, text.Text);
         }
     }
 }

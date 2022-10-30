@@ -12,6 +12,7 @@ using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Controls.Primitives;
 using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Input;
+using Windows.UI.ViewManagement;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
 
@@ -68,6 +69,20 @@ namespace ferrpad
                     // parametr
                     rootFrame.Navigate(typeof(MainPage), e.Arguments);
                 }
+                Windows.UI.ViewManagement.ApplicationViewTitleBar uwpTitleBar = Windows.UI.ViewManagement.ApplicationView.GetForCurrentView().TitleBar;
+
+                uwpTitleBar.ButtonBackgroundColor = Windows.UI.Colors.Transparent;
+
+                uwpTitleBar.BackgroundColor = Windows.UI.Colors.Transparent;
+
+
+
+                //using Windows.ApplicationModel.Core
+
+                Windows.ApplicationModel.Core.CoreApplicationViewTitleBar coreTitleBar = Windows.ApplicationModel.Core.CoreApplication.GetCurrentView().TitleBar;
+
+                coreTitleBar.ExtendViewIntoTitleBar = true;
+                
                 // Upewnij się, ze bieżące okno jest aktywne
                 Window.Current.Activate();
             }
