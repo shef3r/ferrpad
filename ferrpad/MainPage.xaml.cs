@@ -44,6 +44,7 @@ namespace ferrpad
                 WelcomeDialog();
                 localSettings.Values["FirstLaunchFinished"] = "done";
             }
+            ApplicationView.GetForCurrentView().Title = "New file";
         }
 
         private async void WelcomeDialog()
@@ -110,6 +111,7 @@ namespace ferrpad
         private void Copy_Click(object sender, RoutedEventArgs e)
         {
             text.CopySelectionToClipboard();
+
         }
 
         private void Paste_ClickAsync(object sender, RoutedEventArgs e)
@@ -145,6 +147,7 @@ namespace ferrpad
                 if (file != null)
                 {
                     ApplicationView appView = ApplicationView.GetForCurrentView();
+                    appName.Text = file.Name + " - ferrpad";
                     appView.Title = file.Name;
                     text.Text = await FileIO.ReadTextAsync(file);
                     text.ClearUndoRedoHistory();
@@ -184,7 +187,8 @@ namespace ferrpad
                     {
                         CachedFileManager.DeferUpdates(file);
                         await FileIO.WriteTextAsync(file, text.Text);
-
+                        appName.Text = file.Name + " - ferrpad";
+                        ApplicationView.GetForCurrentView().Title = file.Name;
                         try { await CachedFileManager.CompleteUpdatesAsync(file); } catch { }
                     }
                 }
@@ -193,6 +197,14 @@ namespace ferrpad
             {
                 showerror(ex.Message);
             }
+        }
+
+        private void New_Click(object sender, RoutedEventArgs e)
+        {
+            file = null;
+            appName.Text = "ferrpad";
+            ApplicationView.GetForCurrentView().Title = "New file";
+            text.Text = "";
         }
     }
 }
