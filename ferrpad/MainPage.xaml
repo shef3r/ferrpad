@@ -12,36 +12,33 @@
     SizeChanged="UserControl_SizeChanged">
 
     <Grid CornerRadius="0" VerticalAlignment="Stretch" x:Name="mainpanel" HorizontalAlignment="Stretch">
-        <Rectangle HorizontalAlignment="Stretch" VerticalAlignment="Top" Width="30000" Height="40" x:Name="ttb"/>
         <TextBlock x:Name="filename" Height="0" Width="0"/>
-        <StackPanel x:Name="comcont" Orientation="Horizontal" VerticalAlignment="Top" HorizontalAlignment="Stretch" Background="{StaticResource LayerFillColorDefaultBrush}">
-
-            <CommandBar CornerRadius="0" VerticalAlignment="Top" HorizontalAlignment="Left" x:Name="commands" VerticalContentAlignment="Center" OverflowButtonVisibility="Collapsed">
-                <AppBarButton Label="Open" Icon="OpenFile" x:Name="Open" Click="Open_Click"/>
-                <AppBarButton Label="Save" Icon="Save" x:Name="Save" Click="Save_Click"/>
-                <AppBarButton Label="Undo" x:Name="Undo" Click="Undo_Click">
-                    <FontIcon Glyph="&#xE10E;" />
-                </AppBarButton>
-                <AppBarButton Label="Redo" x:Name="Redo" Click="Redo_Click">
-                    <FontIcon Glyph="&#xE10D;" />
-                </AppBarButton>
-                <AppBarSeparator/>
-                <AppBarButton Label="Cut" x:Name="Cut" Click="Cut_Click">
-                    <FontIcon Glyph="&#xE16B;" />
-                </AppBarButton>
-                <AppBarButton Label="Copy" x:Name="Copy" Click="Copy_Click">
-                    <FontIcon Glyph="&#xE16F;" />
-                </AppBarButton>
-                <AppBarButton Label="Paste" x:Name="Paste" Click="Paste_ClickAsync">
-                    <FontIcon Glyph="&#xE16D;" />
-                </AppBarButton>
-                <AppBarSeparator/>
-                <AppBarElementContainer VerticalAlignment="Center" VerticalContentAlignment="Center">
-                    <muxc:NumberBox Margin="5,0,5,16" BorderThickness="0" x:Name="textsize" PlaceholderText="Editor text size"  Value="16" SpinButtonPlacementMode="Compact" />
-                </AppBarElementContainer>
-            </CommandBar>
-        </StackPanel>
-        <TextBox FontSize="{Binding Value, ElementName=textsize, Mode=TwoWay}" AcceptsReturn="True" Background="Transparent" Style="{StaticResource TBStyle}" SelectionChanged="text_SelectionChanged" TextChanged="text_TextChanged" BorderThickness="0" CornerRadius="0" VerticalAlignment="Stretch" x:Name="text" HorizontalAlignment="Stretch"/>
+        <StackPanel x:Name="comcont" Orientation="Horizontal" VerticalAlignment="Top" HorizontalAlignment="Stretch" Background="{StaticResource LayerFillColorDefaultBrush}" Height="50"/>
+        <CommandBar CornerRadius="0" VerticalAlignment="Top" HorizontalAlignment="Left" x:Name="commands" VerticalContentAlignment="Center" OverflowButtonVisibility="Collapsed">
+            <AppBarButton Label="Open" Icon="OpenFile" x:Name="Open" Click="Open_Click"/>
+            <AppBarButton Label="Save" Icon="Save" x:Name="Save" Click="Save_Click"/>
+            <AppBarButton Label="Undo" x:Name="Undo" Click="Undo_Click">
+                <FontIcon Glyph="&#xE10E;" />
+            </AppBarButton>
+            <AppBarButton Label="Redo" x:Name="Redo" Click="Redo_Click">
+                <FontIcon Glyph="&#xE10D;" />
+            </AppBarButton>
+            <AppBarSeparator/>
+            <AppBarButton Label="Cut" x:Name="Cut" Click="Cut_Click">
+                <FontIcon Glyph="&#xE16B;" />
+            </AppBarButton>
+            <AppBarButton Label="Copy" x:Name="Copy" Click="Copy_Click">
+                <FontIcon Glyph="&#xE16F;" />
+            </AppBarButton>
+            <AppBarButton Label="Paste" x:Name="Paste" Click="Paste_ClickAsync">
+                <FontIcon Glyph="&#xE16D;" />
+            </AppBarButton>
+            <AppBarSeparator/>
+            <AppBarElementContainer VerticalAlignment="Center" VerticalContentAlignment="Center">
+                <muxc:NumberBox Margin="5,0,5,16" BorderThickness="0" x:Name="textsize" PlaceholderText="Editor text size"  Value="16" SpinButtonPlacementMode="Compact" />
+            </AppBarElementContainer>
+        </CommandBar>
+        <TextBox FontSize="{Binding Value, ElementName=textsize, Mode=TwoWay}" AcceptsReturn="True" Background="Transparent" Style="{StaticResource TBStyle}" TextChanged="text_TextChanged" BorderThickness="0" CornerRadius="0" VerticalAlignment="Stretch" x:Name="text" HorizontalAlignment="Stretch" Margin="0,50,0,0"/>
         <StackPanel Orientation="Horizontal" Height="32" BorderThickness="0" VerticalAlignment="Bottom" x:Name="bottombar" Padding="15,0,0,0" Background="{StaticResource LayerFillColorDefaultBrush}">
             <TextBlock FontWeight="SemiBold" FontSize="10" VerticalAlignment="Center">Word count:</TextBlock>
             <TextBlock FontWeight="Normal" FontSize="10" Margin="2,0,0,0" VerticalAlignment="Center" x:Name="wordcount">0</TextBlock>

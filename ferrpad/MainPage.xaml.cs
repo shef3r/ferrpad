@@ -4,10 +4,13 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Net.NetworkInformation;
 using System.Runtime.InteropServices.WindowsRuntime;
+using Windows.ApplicationModel.Core;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
 using Windows.Storage;
+using Windows.Storage.Pickers;
 using Windows.UI.Text;
 using Windows.UI.ViewManagement;
 using Windows.UI.Xaml;
@@ -32,11 +35,10 @@ namespace ferrpad
         StorageFile file {  get; set; }
         public MainPage()
         {
-
             this.InitializeComponent();
             ApplicationDataContainer localSettings = ApplicationData.Current.LocalSettings;
             Object value = localSettings.Values["FirstLaunchFinished"];
-            Window.Current.SetTitleBar(ttb);
+            Window.Current.SetTitleBar(comcont);
             if (value == null)
             {
                 WelcomeDialog();
@@ -66,11 +68,9 @@ namespace ferrpad
 
         private async void showerror(string error)
         {
-            ContentDialog dialogerror = new ContentDialog();
-            dialogerror.Title = "Oops, an error occured!";
-            dialogerror.PrimaryButtonText = "OK";
-            dialogerror.Content = error;
-            await dialogerror.ShowAsync();
+            ContentDialog notimplemented = new ContentDialog() { PrimaryButtonText = "ill keep it to myself lmaooo", Title = "Damn you got it to crash :skull:", Content = "Here's the exception in case u want to report it or smth: " + error, SecondaryButtonText = "Complain" };
+            notimplemented.SecondaryButtonClick += Notimplemented_SecondaryButtonClick;
+            await notimplemented.ShowAsync();
         }
 
         private void UserControl_SizeChanged(object sender, SizeChangedEventArgs e)
@@ -104,8 +104,7 @@ namespace ferrpad
 
         private void Cut_Click(object sender, RoutedEventArgs e)
         {
-            text.CopySelectionToClipboard();
-            text.Text.Remove(text.Text.IndexOf(text.SelectedText));
+            text.CutSelectionToClipboard();
         }
 
         private void Copy_Click(object sender, RoutedEventArgs e)
@@ -133,38 +132,67 @@ namespace ferrpad
             await Windows.System.Launcher.LaunchUriAsync(new Uri("https://github.com/shef3r/ferrpad/issues/new"));
         }
 
-        private void text_SelectionChanged(object sender, RoutedEventArgs e)
-        {
-        }
-
-        private void AppBarButton_Click(object sender, RoutedEventArgs e)
-        {
-
-        }
-
         private async void Open_Click(object sender, RoutedEventArgs e)
         {
-            var picker = new Windows.Storage.Pickers.FileOpenPicker();
-            picker.ViewMode = Windows.Storage.Pickers.PickerViewMode.Thumbnail;
-            picker.SuggestedStartLocation = Windows.Storage.Pickers.PickerLocationId.DocumentsLibrary;
-            picker.FileTypeFilter.Add(".txt");
+            try
+            {
+                var picker = new Windows.Storage.Pickers.FileOpenPicker();
+                picker.ViewMode = Windows.Storage.Pickers.PickerViewMode.Thumbnail;
+                picker.SuggestedStartLocation = Windows.Storage.Pickers.PickerLocationId.DocumentsLibrary;
+                picker.FileTypeFilter.Add(".txt");
 
-            file = await picker.PickSingleFileAsync();
-            if (file != null)
-            {
-                ApplicationView appView = ApplicationView.GetForCurrentView();
-                appView.Title = file.Name;
-                text.Text = await FileIO.ReadTextAsync(file);
-                text.ClearUndoRedoHistory();
+                file = await picker.PickSingleFileAsync();
+                if (file != null)
+                {
+                    ApplicationView appView = ApplicationView.GetForCurrentView();
+                    appView.Title = file.Name;
+                    text.Text = await FileIO.ReadTextAsync(file);
+                    text.ClearUndoRedoHistory();
+                }
+                else
+                {
+                }
             }
-            else
+            catch (Exception ex)
             {
+                showerror(ex.Message);
             }
         }
 
         private async void Save_Click(object sender, RoutedEventArgs e)
         {
-            await FileIO.WriteTextAsync(file, text.Text);
+            try
+            {
+                if (file != null)
+                {
+                    CachedFileManager.DeferUpdates(file);
+                    await FileIO.WriteTextAsync(file, text.Text);
+                    try { await CachedFileManager.CompleteUpdatesAsync(file); } catch { }
+                }
+                else
+                {
+                    var savePicker = new FileSavePicker
+                    {
+                        SuggestedStartLocation = PickerLocationId.DocumentsLibrary
+                    };
+
+                    savePicker.FileTypeChoices.Add("Plain Text", new List<string>() { ".txt" });
+                    savePicker.SuggestedFileName = "New Document";
+                    file = await savePicker.PickSaveFileAsync();
+
+                    if (file != null)
+                    {
+                        CachedFileManager.DeferUpdates(file);
+                        await FileIO.WriteTextAsync(file, text.Text);
+
+                        try { await CachedFileManager.CompleteUpdatesAsync(file); } catch { }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                showerror(ex.Message);
+            }
         }
     }
 }
