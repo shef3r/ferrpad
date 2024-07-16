@@ -4,5 +4,4 @@
 
 <p align=center>
 <img src="https://img.shields.io/badge/contributions-welcome-brightgreen.svg?style=flat">
-<img src="https://img.shields.io/badge/contributions-welcome-brightgreen.svg?style=flat">
 </p>
