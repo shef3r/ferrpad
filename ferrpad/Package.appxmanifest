@@ -7,8 +7,8 @@
   IgnorableNamespaces="uap mp">
 
   <Identity
-    Name="a7ba1629-4446-414d-b7fb-814c47820dc0"
-    Publisher="CN=shefer"
+    Name="shef3r.ferrpad"
+    Publisher="CN=shef3r"
     Version="1.0.0.0" />
 
   <mp:PhoneIdentity PhoneProductId="a7ba1629-4446-414d-b7fb-814c47820dc0" PhonePublisherId="00000000-0000-0000-0000-000000000000"/>
@@ -43,8 +43,4 @@
       </uap:VisualElements>
     </Application>
   </Applications>
-
-  <Capabilities>
-    <Capability Name="internetClient" />
-  </Capabilities>
 </Package>
