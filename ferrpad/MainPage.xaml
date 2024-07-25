@@ -14,13 +14,6 @@
         <StackPanel x:Name="comcont" Orientation="Horizontal" VerticalAlignment="Top" HorizontalAlignment="Stretch" Background="{StaticResource LayerFillColorDefaultBrush}" Height="50">
         </StackPanel>
         <CommandBar CornerRadius="0" VerticalAlignment="Top" HorizontalAlignment="Left" x:Name="commands" Margin="0,2,0,0" VerticalContentAlignment="Center" OverflowButtonVisibility="Collapsed">
-            <AppBarElementContainer VerticalContentAlignment="Stretch">
-                <StackPanel Orientation="Horizontal" VerticalAlignment="Top" Height="50">
-                    <Image Source="Assets/Square44x44Logo.altform-lightunplated_targetsize-256.png" Width="20" Margin="30,0,20,0" VerticalAlignment="Center"/>
-                    <TextBlock FontSize="12" VerticalAlignment="Center" Margin="-10,0,30,0" Opacity=".8" x:Name="appName">ferrpad</TextBlock>
-                </StackPanel>
-            </AppBarElementContainer>
-            <AppBarSeparator/>
             <AppBarButton Label="New" Icon="Document" x:Name="New" Click="New_Click">
                 <AppBarButton.KeyboardAccelerators>
                     <KeyboardAccelerator Modifiers="Control" Key="N"/>
