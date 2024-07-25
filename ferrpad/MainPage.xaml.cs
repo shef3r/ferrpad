@@ -147,7 +147,6 @@ namespace ferrpad
                 if (file != null)
                 {
                     ApplicationView appView = ApplicationView.GetForCurrentView();
-                    appName.Text = file.Name + " - ferrpad";
                     appView.Title = file.Name;
                     text.Text = await FileIO.ReadTextAsync(file);
                     text.ClearUndoRedoHistory();
@@ -187,7 +186,6 @@ namespace ferrpad
                     {
                         CachedFileManager.DeferUpdates(file);
                         await FileIO.WriteTextAsync(file, text.Text);
-                        appName.Text = file.Name + " - ferrpad";
                         ApplicationView.GetForCurrentView().Title = file.Name;
                         try { await CachedFileManager.CompleteUpdatesAsync(file); } catch { }
                     }
@@ -202,7 +200,6 @@ namespace ferrpad
         private void New_Click(object sender, RoutedEventArgs e)
         {
             file = null;
-            appName.Text = "ferrpad";
             ApplicationView.GetForCurrentView().Title = "New file";
             text.Text = "";
         }
